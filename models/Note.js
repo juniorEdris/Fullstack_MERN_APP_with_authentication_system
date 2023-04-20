@@ -9,15 +9,15 @@ const noteSchema = new mongoose.Schema(
       ref: "User",
     },
     title: {
-      type: string,
+      type: String,
       required: true,
     },
     text: {
-      type: string,
+      type: String,
       required: true,
     },
     completed: {
-      type: boolean,
+      type: Boolean,
       default: true,
     },
   },
@@ -32,4 +32,4 @@ noteSchema.plugin(AutoIncrement, {
   start_seq: 500,
 });
 
-module.exports = mongoose.model("User", noteSchema);
+module.exports = mongoose.model("Note", noteSchema); // mongoose.models.Note &&

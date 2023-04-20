@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Note = require("../models/Note");
 const User = require("../models/User");
+const { isObjectIdOrHexString } = require("mongoose");
 
 // @desc Get all notes
 // @route GET /notes
@@ -31,27 +32,32 @@ const getAllNotes = asyncHandler(async (req, res) => {
 // @route POST /notes
 // @access Private
 const createNewNote = asyncHandler(async (req, res) => {
-  const { user, title, text } = req.body;
+  try {
+    const { user, title, text } = req.body;
+    console.log(isObjectIdOrHexString(user));
+    // Confirm data
+    if (!user || !title || !text) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
-  // Confirm data
-  if (!user || !title || !text) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
+    // Check for duplicate title
+    const duplicate = await Note.findOne({ title }).lean().exec();
 
-  // Check for duplicate title
-  const duplicate = await Note.findOne({ title }).lean().exec();
+    if (duplicate) {
+      return res.status(409).json({ message: "Duplicate note title" });
+    }
 
-  if (duplicate) {
-    return res.status(409).json({ message: "Duplicate note title" });
-  }
+    // Create and store the new user
+    const note = await Note.create({
+      user,
+      title,
+      text,
+    });
+    console.log({ note });
 
-  // Create and store the new user
-  const note = await Note.create({ user, title, text });
-
-  if (note) {
-    // Created
     return res.status(201).json({ message: "New note created" });
-  } else {
+  } catch (error) {
+    console.log(error);
     return res.status(400).json({ message: "Invalid note data received" });
   }
 });

@@ -24,6 +24,8 @@ const PORT = process.env.NODE_LOCALHOST;
 // app.use(express.static("build"));
 
 // import all routes
+const usersRoute = require("./routes/userRoutes");
+const notesRoute = require("./routes/notesRoutes");
 
 // Allow cross-origin request
 const serverURL =
@@ -37,6 +39,11 @@ app.use(cors(corsOption));
 app.use(express.json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// all api routes
+
+app.use("/users", usersRoute);
+app.use("/notes", notesRoute);
 
 // get error logs
 // app.use(errorHandler);
